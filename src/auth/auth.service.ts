@@ -5,7 +5,6 @@ import * as bcrypt from 'bcrypt';
 import PostgresErrorCode from '../auth/enum/postgresErrorCode.enum';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
-import TokenPayload from './tokenPayload.interface';
 
 @Injectable()
 export class AuthService {
@@ -19,7 +18,6 @@ export class AuthService {
     const saltRounds = 10;
     const salt = await bcrypt.genSalt(saltRounds);
     const hashedPassword = await bcrypt.hash(registrationData.password, salt);
-
     try {
       const createdUser = await this.usersService.create({
         ...registrationData,
@@ -44,7 +42,7 @@ export class AuthService {
   public async getAuthenticatedUser(email: string, plainTextPassword: string) {
     try {
       const user = await this.usersService.getByEmail(email);
-      await this.verifyPassword(plainTextPassword, user[1].password);
+      await this.verifyPassword(plainTextPassword, user[0].password);
       return user;
     } catch (error) {
       throw new HttpException(
