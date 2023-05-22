@@ -16,13 +16,15 @@ export class AuthService {
   ) {}
 
   public async register(registrationData: RegisterDto) {
+    // const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(registrationData.password, 10);
+
     try {
       const createdUser = await this.usersService.create({
         ...registrationData,
         password: hashedPassword,
       });
-      createdUser.password = undefined;
+      createdUser.password === undefined;
       return createdUser;
     } catch (error) {
       if (error?.code === PostgresErrorCode.UniqueViolation) {
