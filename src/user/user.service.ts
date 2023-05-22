@@ -22,6 +22,15 @@ export class UserService {
     );
   }
 
+  async createUser(createUserDto: CreateUserDto) {
+    const newUser = new User();
+
+    newUser.email = createUserDto.email;
+    newUser.password = createUserDto.password;
+
+    return await this.usersRepository.save(newUser);
+  }
+
   async getById(id: number) {
     const user = await this.usersRepository.findBy({ id });
     if (user) {

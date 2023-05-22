@@ -16,8 +16,9 @@ export class AuthService {
   ) {}
 
   public async register(registrationData: RegisterDto) {
-    // const salt = await bcrypt.genSalt(10);
-    const hashedPassword = await bcrypt.hash(registrationData.password, 10);
+    const saltRounds = 10;
+    const salt = await bcrypt.genSalt(saltRounds);
+    const hashedPassword = await bcrypt.hash(registrationData.password, salt);
 
     try {
       const createdUser = await this.usersService.create({
@@ -38,18 +39,6 @@ export class AuthService {
         HttpStatus.INTERNAL_SERVER_ERROR,
       );
     }
-  }
-
-  public getCookieWithJwtToken(userId: number) {
-    const payload: TokenPayload = { userId };
-    const token = this.jwtService.sign(payload);
-    return `Authentication=${token}; HttpOnly; Path=/; Max-Age=${this.configService.get(
-      'JWT_EXPIRATION_TIME',
-    )}`;
-  }
-
-  public getCookieForLogOut() {
-    return `Authentication=; HttpOnly; Path=/; Max-Age=0`;
   }
 
   public async getAuthenticatedUser(email: string, plainTextPassword: string) {
