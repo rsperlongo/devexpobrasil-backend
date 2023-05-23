@@ -1,3 +1,4 @@
+import { EventsEntity } from './events/events.entity';
 import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
@@ -5,6 +6,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { AuthModule } from './auth/auth.module';
 import { UserModule } from './user/user.module';
+import { EventsModule } from './events/events.module';
 
 @Module({
   imports: [
@@ -23,13 +25,14 @@ import { UserModule } from './user/user.module';
         username: configService.get('POSTGRES_USER'),
         password: configService.get('POSTGRES_PASSWORD'),
         database: configService.get('POSTGRES_DB'),
-        entities: [],
+        entities: [EventsEntity],
         synchronize: true,
         autoLoadEntities: true,
       }),
     }),
     AuthModule,
     UserModule,
+    EventsModule,
   ],
   controllers: [AppController],
   providers: [AppService],
