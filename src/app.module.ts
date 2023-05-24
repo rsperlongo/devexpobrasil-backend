@@ -7,6 +7,8 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { AuthModule } from './auth/auth.module';
 import { UserModule } from './user/user.module';
 import { EventsModule } from './events/events.module';
+import { CalendarModule } from './calendar/calendar.module';
+import { CalendarEntity } from './calendar/calendar.entity';
 
 @Module({
   imports: [
@@ -25,7 +27,7 @@ import { EventsModule } from './events/events.module';
         username: configService.get('POSTGRES_USER'),
         password: configService.get('POSTGRES_PASSWORD'),
         database: configService.get('POSTGRES_DB'),
-        entities: [EventsEntity],
+        entities: [EventsEntity, CalendarEntity],
         synchronize: true,
         autoLoadEntities: true,
       }),
@@ -33,6 +35,7 @@ import { EventsModule } from './events/events.module';
     AuthModule,
     UserModule,
     EventsModule,
+    CalendarModule,
   ],
   controllers: [AppController],
   providers: [AppService],

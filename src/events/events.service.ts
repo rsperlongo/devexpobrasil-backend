@@ -35,15 +35,15 @@ export class EventsService {
   }
 
   async update(id: string, updateEvent: UpdateEventsDto) {
-    const products = await this.eventsRepository.preload({
+    const events = await this.eventsRepository.preload({
       id,
       ...updateEvent,
     });
 
-    if (!products) {
+    if (!events) {
       throw new NotFoundException(`Product ${id} not found`);
     }
-    return this.eventsRepository.save(products);
+    return this.eventsRepository.save(events);
   }
 
   async remove(id: string) {
