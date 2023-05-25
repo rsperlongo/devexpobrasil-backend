@@ -28,7 +28,7 @@ import { CalendarEntity } from './calendar/calendar.entity';
         password: configService.get('POSTGRES_PASSWORD'),
         database: configService.get('POSTGRES_DB'),
         entities: [EventsEntity, CalendarEntity],
-        synchronize: true,
+        synchronize: false,
         autoLoadEntities: true,
       }),
     }),

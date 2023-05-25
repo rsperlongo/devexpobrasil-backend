@@ -1,11 +1,10 @@
 import {
   IsDate,
-  IsEnum,
+  IsDateString,
   IsNotEmpty,
   IsString,
-  isValidationOptions,
+  Matches,
 } from 'class-validator';
-import { TypeEnum } from '../calendar.entity';
 
 export class CreateCalendarDTO {
   @IsString()
@@ -15,7 +14,8 @@ export class CreateCalendarDTO {
   @IsString()
   date: string;
 
-  @IsDate()
+  @IsDateString()
+  @Matches(/^\d?\d:\d{2}:\d{2}$/)
   datetime: Date;
 
   @IsString()
@@ -26,6 +26,7 @@ export class CreateCalendarDTO {
   @IsNotEmpty()
   speakerDescription: string;
 
-  @IsEnum(isValidationOptions)
-  type: TypeEnum;
+  @IsString()
+  @IsNotEmpty()
+  type: string;
 }

@@ -1,11 +1,6 @@
 import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
 
-export enum TypeEnum {
-  PALESTRA = 'Palestra',
-  DEBATE = 'Debate',
-}
-
-@Entity()
+@Entity('calendar')
 export class CalendarEntity {
   @PrimaryGeneratedColumn('uuid')
   id: string;
@@ -16,7 +11,7 @@ export class CalendarEntity {
   @Column('varchar')
   date: string;
 
-  @Column('time')
+  @Column('date')
   datetime: Date;
 
   @Column('varchar', { length: 250 })
@@ -25,9 +20,6 @@ export class CalendarEntity {
   @Column('varchar', { length: 250 })
   speakerDescription: string;
 
-  @Column({
-    type: 'enum',
-    enum: TypeEnum,
-  })
-  type: TypeEnum;
+  @Column('varchar')
+  type: string;
 }

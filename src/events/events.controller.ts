@@ -31,7 +31,7 @@ export class EventsController {
   }
 
   @Patch('/:id')
-  async updateProduct(
+  async updateCalendar(
     @Param('id') id: string,
     @Body() updateEvent: UpdateEventsDto,
   ): Promise<UpdateEventsDto> {
