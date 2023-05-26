@@ -11,8 +11,8 @@ export class CalendarEntity {
   @Column('varchar')
   date: string;
 
-  @Column('date')
-  datetime: Date;
+  @Column('varchar')
+  datetime: string;
 
   @Column('varchar', { length: 250 })
   eventDescription: string;

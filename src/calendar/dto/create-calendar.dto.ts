@@ -1,10 +1,4 @@
-import {
-  IsDate,
-  IsDateString,
-  IsNotEmpty,
-  IsString,
-  Matches,
-} from 'class-validator';
+import { IsNotEmpty, IsString } from 'class-validator';
 
 export class CreateCalendarDTO {
   @IsString()
@@ -14,9 +8,8 @@ export class CreateCalendarDTO {
   @IsString()
   date: string;
 
-  @IsDateString()
-  @Matches(/^\d?\d:\d{2}:\d{2}$/)
-  datetime: Date;
+  @IsString()
+  datetime: string;
 
   @IsString()
   @IsNotEmpty()
