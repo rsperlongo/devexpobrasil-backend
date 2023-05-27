@@ -1,13 +1,13 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { UserService } from '../user/user.service';
-import PostgresErrorCode from '../auth/enum/postgresErrorCode.enum';
 import { JwtService } from '@nestjs/jwt';
 import { CreateUserDto } from 'src/user/dto/createUser.dto';
-// import { RegistrationStatus } from './interfaces/registration-status.interface';
+import { RegistrationStatus } from './interfaces/registration-status.interface';
 import { LogInDto } from './dto/logIn.dto';
 import { LoginStatus } from './interfaces/login-status.interface';
 import { UserDto } from 'src/user/dto/user.dto';
 import { JwtPayload } from './interfaces/payload.interfaces';
+import { LoginUserDto } from 'src/user/dto/user-login.dto';
 
 @Injectable()
 export class AuthService {
@@ -16,28 +16,23 @@ export class AuthService {
     private readonly jwtService: JwtService,
   ) {}
 
-  public async register(userDto: CreateUserDto) {
-    // const status: RegistrationStatus = {
-    //   success: true,
-    //   message: 'user registered',
-    // };
+  public async register(userDto: CreateUserDto): Promise<RegistrationStatus> {
+    let status: RegistrationStatus = {
+      success: true,
+      message: 'user registered',
+    };
     try {
       await this.usersService.create(userDto);
     } catch (error) {
-      if (error?.code === PostgresErrorCode.UniqueViolation) {
-        throw new HttpException(
-          'User with that email already exists',
-          HttpStatus.BAD_REQUEST,
-        );
-      }
-      throw new HttpException(
-        'Something went wrong',
-        HttpStatus.INTERNAL_SERVER_ERROR,
-      );
+      status = {
+        success: false,
+        message: error,
+      };
     }
+    return status;
   }
 
-  async login(loginUserDto: LogInDto): Promise<LoginStatus> {
+  async login(loginUserDto: LoginUserDto): Promise<LoginStatus> {
     // find user in db
     const user = await this.usersService.findByLogin(loginUserDto);
 
@@ -63,38 +58,10 @@ export class AuthService {
 
     const user: JwtPayload = { email };
     const accessToken = this.jwtService.sign(user);
+    console.log(accessToken);
     return {
       expiresIn,
       accessToken,
     };
   }
-
-  /* public async getAuthenticatedUser(email: string, plainTextPassword: string) {
-    try {
-      const user = await this.usersService.getByEmail(email);
-      await this.verifyPassword(plainTextPassword, user[0].password);
-      return user;
-    } catch (error) {
-      throw new HttpException(
-        'Wrong credentials provided',
-        HttpStatus.BAD_REQUEST,
-      );
-    }
-  } */
-
-  /* private async verifyPassword(
-    plainTextPassword: string,
-    hashedPassword: string,
-  ) {
-    const isPasswordMatching = await bcrypt.compare(
-      plainTextPassword,
-      hashedPassword,
-    );
-    if (!isPasswordMatching) {
-      throw new HttpException(
-        'Wrong credentials provided',
-        HttpStatus.BAD_REQUEST,
-      );
-    }
-  } */
 }

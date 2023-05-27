@@ -5,8 +5,9 @@ import User from './user.entity';
 import { Repository } from 'typeorm';
 import { CreateUserDto } from './dto/createUser.dto';
 import { LogInDto } from 'src/auth/dto/logIn.dto';
-import { comparePasswords } from 'src/shared/utils';
+import { comparePasswords } from '../shared/utils';
 import { toUserDto } from 'src/shared/mapper';
+import { LoginUserDto } from './dto/user-login.dto';
 
 @Injectable()
 export class UserService {
@@ -51,8 +52,10 @@ export class UserService {
     return await this.usersRepository.save(newUser);
   }
 
-  async findByLogin({ email, password }: LogInDto): Promise<UserDto> {
-    const user = await this.usersRepository.findOne({ where: { email } });
+  async findByLogin({ email, password }: LoginUserDto): Promise<UserDto> {
+    const user = await this.usersRepository.findOne({
+      where: { email },
+    });
 
     if (!user) {
       throw new HttpException('User not found', HttpStatus.UNAUTHORIZED);

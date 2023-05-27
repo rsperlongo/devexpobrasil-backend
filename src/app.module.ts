@@ -11,6 +11,7 @@ import { CalendarModule } from './calendar/calendar.module';
 import { CalendarEntity } from './calendar/calendar.entity';
 import { SpeakersModule } from './speakers/speakers.module';
 import { SpeakersEntity } from './speakers/speakers.entity';
+import UserEntity from './user/user.entity';
 
 @Module({
   imports: [
@@ -29,8 +30,8 @@ import { SpeakersEntity } from './speakers/speakers.entity';
         username: configService.get('POSTGRES_USER'),
         password: configService.get('POSTGRES_PASSWORD'),
         database: configService.get('POSTGRES_DB'),
-        entities: [EventsEntity, CalendarEntity, SpeakersEntity],
-        synchronize: false,
+        entities: [EventsEntity, CalendarEntity, SpeakersEntity, UserEntity],
+        synchronize: true,
         autoLoadEntities: true,
       }),
     }),
