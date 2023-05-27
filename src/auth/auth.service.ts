@@ -1,30 +1,28 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { UserService } from '../user/user.service';
-import RegisterDto from './dto/register.dto';
-import * as bcrypt from 'bcrypt';
 import PostgresErrorCode from '../auth/enum/postgresErrorCode.enum';
 import { JwtService } from '@nestjs/jwt';
-import { ConfigService } from '@nestjs/config';
+import { CreateUserDto } from 'src/user/dto/createUser.dto';
+// import { RegistrationStatus } from './interfaces/registration-status.interface';
+import { LogInDto } from './dto/logIn.dto';
+import { LoginStatus } from './interfaces/login-status.interface';
+import { UserDto } from 'src/user/dto/user.dto';
+import { JwtPayload } from './interfaces/payload.interfaces';
 
 @Injectable()
 export class AuthService {
   constructor(
     private readonly usersService: UserService,
     private readonly jwtService: JwtService,
-    private readonly configService: ConfigService,
   ) {}
 
-  public async register(registrationData: RegisterDto) {
-    const saltRounds = 10;
-    const salt = await bcrypt.genSalt(saltRounds);
-    const hashedPassword = await bcrypt.hash(registrationData.password, salt);
+  public async register(userDto: CreateUserDto) {
+    // const status: RegistrationStatus = {
+    //   success: true,
+    //   message: 'user registered',
+    // };
     try {
-      const createdUser = await this.usersService.create({
-        ...registrationData,
-        password: hashedPassword,
-      });
-      createdUser.password === undefined;
-      return createdUser;
+      await this.usersService.create(userDto);
     } catch (error) {
       if (error?.code === PostgresErrorCode.UniqueViolation) {
         throw new HttpException(
@@ -39,7 +37,39 @@ export class AuthService {
     }
   }
 
-  public async getAuthenticatedUser(email: string, plainTextPassword: string) {
+  async login(loginUserDto: LogInDto): Promise<LoginStatus> {
+    // find user in db
+    const user = await this.usersService.findByLogin(loginUserDto);
+
+    // generate and sign token
+    const token = this._createToken(user);
+
+    return {
+      email: user.email,
+      ...token,
+    };
+  }
+
+  async validateUser(payload: JwtPayload): Promise<UserDto> {
+    const user = await this.usersService.findByPayload(payload);
+    if (!user) {
+      throw new HttpException('Invalid token', HttpStatus.UNAUTHORIZED);
+    }
+    return user;
+  }
+
+  private _createToken({ email }: UserDto): any {
+    const expiresIn = process.env.EXPIRESIN;
+
+    const user: JwtPayload = { email };
+    const accessToken = this.jwtService.sign(user);
+    return {
+      expiresIn,
+      accessToken,
+    };
+  }
+
+  /* public async getAuthenticatedUser(email: string, plainTextPassword: string) {
     try {
       const user = await this.usersService.getByEmail(email);
       await this.verifyPassword(plainTextPassword, user[0].password);
@@ -50,9 +80,9 @@ export class AuthService {
         HttpStatus.BAD_REQUEST,
       );
     }
-  }
+  } */
 
-  private async verifyPassword(
+  /* private async verifyPassword(
     plainTextPassword: string,
     hashedPassword: string,
   ) {
@@ -66,5 +96,5 @@ export class AuthService {
         HttpStatus.BAD_REQUEST,
       );
     }
-  }
+  } */
 }

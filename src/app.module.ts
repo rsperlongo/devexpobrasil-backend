@@ -30,7 +30,7 @@ import { SpeakersEntity } from './speakers/speakers.entity';
         password: configService.get('POSTGRES_PASSWORD'),
         database: configService.get('POSTGRES_DB'),
         entities: [EventsEntity, CalendarEntity, SpeakersEntity],
-        synchronize: true,
+        synchronize: false,
         autoLoadEntities: true,
       }),
     }),
