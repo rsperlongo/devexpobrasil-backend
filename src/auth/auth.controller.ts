@@ -1,48 +1,43 @@
 import {
   Body,
   Controller,
-  Get,
-  HttpCode,
+  HttpException,
+  HttpStatus,
   Post,
-  Req,
   Res,
-  UseGuards,
 } from '@nestjs/common';
 import { Response } from 'express';
 import { AuthService } from './auth.service';
-import RegisterDto from './dto/register.dto';
-import { LocalAuthenticationGuard } from './localauth.guard';
-import RequestWithUser from './requestWithUser.interface';
-import JwtAuthenticationGuard from './jwt-authentication.guard';
+import { LogInDto } from './dto/logIn.dto';
+import { LoginStatus } from './interfaces/login-status.interface';
+import { CreateUserDto } from 'src/user/dto/createUser.dto';
+import { RegistrationStatus } from './interfaces/registration-status.interface';
 
 @Controller('auth')
 export class AuthController {
   constructor(private readonly authenticationService: AuthService) {}
 
   @Post('register')
-  async register(@Body() registrationData: RegisterDto) {
-    return this.authenticationService.register(registrationData);
+  public async register(
+    @Body() createUserDto: CreateUserDto,
+  ): Promise<RegistrationStatus> {
+    const result: RegistrationStatus =
+      await this.authenticationService.register(createUserDto);
+
+    if (!result.success) {
+      throw new HttpException(result.message, HttpStatus.BAD_REQUEST);
+    }
+
+    return result;
   }
 
-  @HttpCode(200)
-  @UseGuards(LocalAuthenticationGuard)
-  @Post('log-in')
-  async logIn(@Req() request: RequestWithUser, @Res() response: Response) {
-    const { user } = request;
-    return response.send(user);
+  @Post('login')
+  async logIn(@Body() loginUserDto: LogInDto): Promise<LoginStatus> {
+    return await this.authenticationService.login(loginUserDto);
   }
 
-  @UseGuards(JwtAuthenticationGuard)
   @Post('log-out')
   async logOut(@Res() response: Response) {
     return response.sendStatus(200);
-  }
-
-  @UseGuards(JwtAuthenticationGuard)
-  @Get()
-  authenticate(@Req() request: RequestWithUser) {
-    const user = request.user;
-    user.password = undefined;
-    return user;
   }
 }

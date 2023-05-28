@@ -1,70 +1,69 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { UserService } from '../user/user.service';
-import RegisterDto from './dto/register.dto';
-import * as bcrypt from 'bcrypt';
-import PostgresErrorCode from '../auth/enum/postgresErrorCode.enum';
 import { JwtService } from '@nestjs/jwt';
-import { ConfigService } from '@nestjs/config';
+import { CreateUserDto } from 'src/user/dto/createUser.dto';
+import { RegistrationStatus } from './interfaces/registration-status.interface';
+import { LoginStatus } from './interfaces/login-status.interface';
+import { UserDto } from 'src/user/dto/user.dto';
+import { JwtPayload } from './interfaces/payload.interfaces';
+import { LoginUserDto } from 'src/user/dto/user-login.dto';
 
 @Injectable()
 export class AuthService {
   constructor(
     private readonly usersService: UserService,
     private readonly jwtService: JwtService,
-    private readonly configService: ConfigService,
   ) {}
 
-  public async register(registrationData: RegisterDto) {
-    const saltRounds = 10;
-    const salt = await bcrypt.genSalt(saltRounds);
-    const hashedPassword = await bcrypt.hash(registrationData.password, salt);
+  public async register(userDto: CreateUserDto): Promise<RegistrationStatus> {
+    let status: RegistrationStatus = {
+      success: true,
+      message: 'user registered',
+    };
     try {
-      const createdUser = await this.usersService.create({
-        ...registrationData,
-        password: hashedPassword,
-      });
-      createdUser.password === undefined;
-      return createdUser;
+      await this.usersService.create(userDto);
     } catch (error) {
-      if (error?.code === PostgresErrorCode.UniqueViolation) {
-        throw new HttpException(
-          'User with that email already exists',
-          HttpStatus.BAD_REQUEST,
-        );
-      }
-      throw new HttpException(
-        'Something went wrong',
-        HttpStatus.INTERNAL_SERVER_ERROR,
-      );
+      status = {
+        success: false,
+        message: error,
+      };
     }
+    return status;
   }
 
-  public async getAuthenticatedUser(email: string, plainTextPassword: string) {
-    try {
-      const user = await this.usersService.getByEmail(email);
-      await this.verifyPassword(plainTextPassword, user[0].password);
-      return user;
-    } catch (error) {
-      throw new HttpException(
-        'Wrong credentials provided',
-        HttpStatus.BAD_REQUEST,
-      );
-    }
+  async login(loginUserDto: LoginUserDto): Promise<LoginStatus> {
+    // find user in db
+    const user = await this.usersService.findByLogin(loginUserDto);
+
+    // generate and sign token
+    const token = this._createToken(user);
+
+    return {
+      email: user.email,
+      ...token,
+    };
   }
 
-  private async verifyPassword(
-    plainTextPassword: string,
-    hashedPassword: string,
-  ) {
-    const isPasswordMatching = await bcrypt.compare(
-      plainTextPassword,
-      hashedPassword,
-    );
-    if (!isPasswordMatching) {
-      throw new HttpException(
-        'Wrong credentials provided',
-        HttpStatus.BAD_REQUEST,
-      );
+  async validateUser(payload: JwtPayload): Promise<UserDto> {
+    const user = await this.usersService.findByPayload(payload);
+    if (!user) {
+      throw new HttpException('Invalid token', HttpStatus.UNAUTHORIZED);
     }
+    return user;
+  }
+
+  private _createToken({ email }: UserDto): any {
+    const expiresIn = process.env.EXPIRESIN;
+
+    const user: JwtPayload = { email };
+    const accessToken = this.jwtService.sign(user, {
+      secret: process.env.JWT_SECRET,
+      expiresIn: '60h',
+    });
+    console.log(accessToken);
+    return {
+      expiresIn,
+      accessToken,
+    };
   }
 }

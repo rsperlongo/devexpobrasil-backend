@@ -1,8 +1,11 @@
+import { UserDto } from '../user/dto/user.dto';
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import User from './user.entity';
 import { Repository } from 'typeorm';
 import { CreateUserDto } from './dto/createUser.dto';
+import { toUserDto } from 'src/shared/mapper';
+import { LoginUserDto } from './dto/user-login.dto';
 
 @Injectable()
 export class UserService {
@@ -31,7 +34,7 @@ export class UserService {
     return await this.usersRepository.save(newUser);
   }
 
-  async getById(id: number) {
+  async getById(id: string) {
     const user = await this.usersRepository.findOne({ where: { id } });
     if (user) {
       return user;
@@ -45,5 +48,26 @@ export class UserService {
   async create(userData: CreateUserDto) {
     const newUser = await this.usersRepository.create(userData);
     return await this.usersRepository.save(newUser);
+  }
+
+  async findByLogin({ email, password }: LoginUserDto): Promise<UserDto> {
+    const user = await this.usersRepository.findOne({
+      where: { email },
+    });
+
+    if (!user) {
+      throw new HttpException('User not found', HttpStatus.UNAUTHORIZED);
+    }
+
+    // compare passwords
+    if (user?.password !== password) {
+      throw new HttpException('Invalid credentials', HttpStatus.UNAUTHORIZED);
+    }
+
+    return toUserDto(user);
+  }
+
+  async findByPayload({ email }: any): Promise<UserDto> {
+    return await this.usersRepository.findOne({ where: { email } });
   }
 }

@@ -1,9 +1,9 @@
 import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
 
 @Entity()
-export class User {
+export class UserEntity {
   @PrimaryGeneratedColumn()
-  public id?: number;
+  public id: string;
 
   @Column({ unique: true })
   public email: string;
@@ -12,4 +12,4 @@ export class User {
   public password: string;
 }
 
-export default User;
+export default UserEntity;
