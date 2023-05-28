@@ -4,7 +4,6 @@ import { InjectRepository } from '@nestjs/typeorm';
 import User from './user.entity';
 import { Repository } from 'typeorm';
 import { CreateUserDto } from './dto/createUser.dto';
-import { LogInDto } from 'src/auth/dto/logIn.dto';
 import { comparePasswords } from '../shared/utils';
 import { toUserDto } from 'src/shared/mapper';
 import { LoginUserDto } from './dto/user-login.dto';
@@ -62,11 +61,14 @@ export class UserService {
     }
 
     // compare passwords
-    const areEqual = await comparePasswords(user.password, password);
-
-    if (!areEqual) {
+    //const areEqual = await comparePasswords(user.password, password);
+    if (user?.password !== password) {
       throw new HttpException('Invalid credentials', HttpStatus.UNAUTHORIZED);
     }
+
+    // if (!areEqual) {
+    //   throw new HttpException('Invalid credentials', HttpStatus.UNAUTHORIZED);
+    // }
 
     return toUserDto(user);
   }
