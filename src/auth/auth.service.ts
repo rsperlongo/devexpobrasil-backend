@@ -3,7 +3,6 @@ import { UserService } from '../user/user.service';
 import { JwtService } from '@nestjs/jwt';
 import { CreateUserDto } from 'src/user/dto/createUser.dto';
 import { RegistrationStatus } from './interfaces/registration-status.interface';
-import { LogInDto } from './dto/logIn.dto';
 import { LoginStatus } from './interfaces/login-status.interface';
 import { UserDto } from 'src/user/dto/user.dto';
 import { JwtPayload } from './interfaces/payload.interfaces';
