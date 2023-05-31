@@ -1,5 +1,10 @@
 import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
 
+export enum EventType {
+  NACIONAL = 'nacional',
+  REGIONAL = 'regional',
+}
+
 @Entity('events')
 export class EventsEntity {
   @PrimaryGeneratedColumn('uuid')
@@ -22,4 +27,11 @@ export class EventsEntity {
 
   @Column('varchar')
   description: string;
+
+  @Column({
+    type: 'enum',
+    enum: EventType,
+    default: EventType.NACIONAL,
+  })
+  eventType: EventType;
 }
