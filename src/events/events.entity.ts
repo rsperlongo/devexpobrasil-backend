@@ -22,11 +22,49 @@ export class EventsEntity {
   @Column('varchar')
   address: string;
 
+  //hora do evento(programação)
+  @Column('varchar')
+  eventTime: string;
+
+  //data do início do Evento
   @Column('date')
   eventDate: Date;
 
+  // data do final do evento
+  @Column('date')
+  eventDateEnd: Date;
+
+  //hora do início do evento
   @Column('varchar')
-  description: string;
+  startTime: string;
+
+  // hora do fim do evento
+  @Column('varchar')
+  endTime: string;
+
+  @Column('varchar')
+  eventDescription: string;
+
+  @Column('varchar')
+  title: string;
+
+  @Column('varchar')
+  speakerDescription: string;
+
+  @Column('varchar')
+  sponsor: string;
+
+  @Column('varchar')
+  supporters: string;
+
+  @Column('varchar')
+  exhibitors: string;
+
+  @Column('varchar')
+  auditoriumName: string;
+
+  @Column('varchar')
+  auditoriumDescription: string;
 
   @Column({
     type: 'enum',
