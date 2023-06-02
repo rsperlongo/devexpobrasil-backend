@@ -1,4 +1,5 @@
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { OthersEntity } from 'src/others/others.entity';
+import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
 
 export enum EventType {
   NACIONAL = 'nacional',
@@ -57,8 +58,8 @@ export class EventsEntity {
   @Column('varchar')
   supporters: string;
 
-  @Column('varchar')
-  exhibitors: string;
+  @Column()
+  exhibitorsName: string;
 
   @Column('varchar')
   auditoriumName: string;
@@ -72,4 +73,7 @@ export class EventsEntity {
     default: EventType.NACIONAL,
   })
   eventType: EventType;
+
+  @ManyToOne(() => OthersEntity, (others) => others.exhibitorsName)
+  others: OthersEntity;
 }
