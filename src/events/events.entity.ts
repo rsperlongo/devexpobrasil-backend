@@ -1,4 +1,7 @@
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { OthersEntity } from 'src/others/others.entity';
+import { SponsorsEntity } from 'src/sponsors/sponsors.entity';
+import { SupportersEntity } from 'src/supporters/supporters.entity';
+import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
 
 export enum EventType {
   NACIONAL = 'nacional',
@@ -22,11 +25,49 @@ export class EventsEntity {
   @Column('varchar')
   address: string;
 
+  //hora do evento(programação)
+  @Column('varchar')
+  eventTime: string;
+
+  //data do início do Evento
   @Column('date')
   eventDate: Date;
 
+  // data do final do evento
+  @Column('date')
+  eventDateEnd: Date;
+
+  //hora do início do evento
   @Column('varchar')
-  description: string;
+  startTime: string;
+
+  // hora do fim do evento
+  @Column('varchar')
+  endTime: string;
+
+  @Column('varchar')
+  eventDescription: string;
+
+  @Column('varchar')
+  title: string;
+
+  @Column('varchar')
+  speakerDescription: string;
+
+  @Column('varchar')
+  sponsor: string;
+
+  @Column('varchar')
+  supporters: string;
+
+  @Column('varchar')
+  exhibitorsName: string;
+
+  @Column('varchar')
+  auditoriumName: string;
+
+  @Column('varchar')
+  auditoriumDescription: string;
 
   @Column({
     type: 'enum',
@@ -34,4 +75,13 @@ export class EventsEntity {
     default: EventType.NACIONAL,
   })
   eventType: EventType;
+
+  @ManyToOne(() => OthersEntity, (others) => others.exhibitorsName)
+  others: OthersEntity;
+
+  @ManyToOne(() => SponsorsEntity, (sponsors) => sponsors.sponsorName)
+  sponsors: SponsorsEntity;
+
+  @ManyToOne(() => SupportersEntity, (supporters) => supporters.supportersName)
+  supporter: SupportersEntity;
 }
