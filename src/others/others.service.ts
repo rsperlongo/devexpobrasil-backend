@@ -7,7 +7,6 @@ import {
 import { InjectRepository } from '@nestjs/typeorm';
 import { OthersEntity } from './others.entity';
 import { Repository } from 'typeorm';
-// import { CreateOthersDTO } from './dto/create-others.dto';
 import { UpdateOthersDto } from './dto/update-others.dto';
 
 @Injectable()
@@ -25,6 +24,19 @@ export class OthersService {
     const others = await this.othersRepository.find({ where: { id } });
     if (!others) {
       throw new HttpException(`Product ${id} not found`, HttpStatus.NOT_FOUND);
+    }
+    return others;
+  }
+
+  async findbyName(exhibitorsName: string): Promise<OthersEntity[]> {
+    const others = await this.othersRepository.find({
+      where: { exhibitorsName },
+    });
+    if (!others) {
+      throw new HttpException(
+        `Product ${exhibitorsName} not found`,
+        HttpStatus.NOT_FOUND,
+      );
     }
     return others;
   }

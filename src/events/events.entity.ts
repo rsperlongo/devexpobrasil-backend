@@ -1,4 +1,6 @@
 import { OthersEntity } from 'src/others/others.entity';
+import { SponsorsEntity } from 'src/sponsors/sponsors.entity';
+import { SupportersEntity } from 'src/supporters/supporters.entity';
 import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
 
 export enum EventType {
@@ -58,7 +60,7 @@ export class EventsEntity {
   @Column('varchar')
   supporters: string;
 
-  @Column()
+  @Column('varchar')
   exhibitorsName: string;
 
   @Column('varchar')
@@ -76,4 +78,10 @@ export class EventsEntity {
 
   @ManyToOne(() => OthersEntity, (others) => others.exhibitorsName)
   others: OthersEntity;
+
+  @ManyToOne(() => SponsorsEntity, (sponsors) => sponsors.sponsorName)
+  sponsors: SponsorsEntity;
+
+  @ManyToOne(() => SupportersEntity, (supporters) => supporters.supportersName)
+  supporter: SupportersEntity;
 }

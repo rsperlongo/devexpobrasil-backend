@@ -1,3 +1,4 @@
+import { SupportersEntity } from './supporters/supporters.entity';
 import { EventsEntity } from './events/events.entity';
 import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
@@ -15,6 +16,8 @@ import { OthersModule } from './others/others.module';
 import UserEntity from './user/user.entity';
 import { OthersEntity } from './others/others.entity';
 import { SponsorsModule } from './sponsors/sponsors.module';
+import { SupportersModule } from './supporters/supporters.module';
+import { SponsorsEntity } from './sponsors/sponsors.entity';
 
 @Module({
   imports: [
@@ -39,6 +42,8 @@ import { SponsorsModule } from './sponsors/sponsors.module';
           SpeakersEntity,
           UserEntity,
           OthersEntity,
+          SponsorsEntity,
+          SupportersEntity,
         ],
         synchronize: false,
         autoLoadEntities: true,
@@ -51,6 +56,7 @@ import { SponsorsModule } from './sponsors/sponsors.module';
     SpeakersModule,
     OthersModule,
     SponsorsModule,
+    SupportersModule,
   ],
   controllers: [AppController],
   providers: [AppService],
